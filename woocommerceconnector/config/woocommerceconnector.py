@@ -9,8 +9,8 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
-					"name": "WooCommerce Settings",
-					"label": _("WooCommerce Settings"),
+					"name": "WooCommerce Setting",
+					"label": _("WooCommerce Setting"),
 					"description": _("Settings"),
 				},
 			]

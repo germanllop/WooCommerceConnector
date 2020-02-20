@@ -26,7 +26,7 @@ class WooCommerceSettings(unittest.TestCase):
 		self.setup_woocommerce()
 	
 	def setup_woocommerce(self):
-		woocommerce_settings = frappe.get_doc("WooCommerce Settings")
+		woocommerce_settings = frappe.get_doc("WooCommerce Setting")
 		woocommerce_settings.taxes = []
 		
 		woocommerce_settings.update({
@@ -118,7 +118,7 @@ class WooCommerceSettings(unittest.TestCase):
 		with open (os.path.join(os.path.dirname(__file__), "test_data", "woocommerce_order.json")) as woocommerce_order:
 			woocommerce_order = json.load(woocommerce_order)
 
-		woocommerce_settings = frappe.get_doc("WooCommerce Settings", "WooCommerce Settings")
+		woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
 		
 		create_order(woocommerce_order.get("order"), woocommerce_settings, "_Test Company")
 
@@ -148,7 +148,7 @@ def test_bin(item_code, warehouse):
     return 
 
 def test_multibin(item_code, warehouse):
-    woocommerce_settings = frappe.get_doc("WooCommerce Settings", "WooCommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
     bin = get_bin(item_code, woocommerce_settings.warehouse)
     qty = bin.actual_qty
     for warehouse in woocommerce_settings.warehouses:
@@ -158,7 +158,7 @@ def test_multibin(item_code, warehouse):
     return
 
 def test_update_item_stock(item_code):
-    woocommerce_settings = frappe.get_doc("WooCommerce Settings", "WooCommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
     update_item_stock(item_code, woocommerce_settings)
     print("Updated {0}".format(item_code))
     return

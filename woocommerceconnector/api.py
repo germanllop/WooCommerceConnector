@@ -14,7 +14,7 @@ from frappe.utils.background_jobs import enqueue
 
 @frappe.whitelist()
 def check_hourly_sync():
-	woocommerce_settings = frappe.get_doc("woocommerce Settings")
+	woocommerce_settings = frappe.get_doc("WooCommerce Setting")
 	if woocommerce_settings.hourly_sync == 1:
 		sync_woocommerce()
 
@@ -26,7 +26,7 @@ def sync_woocommerce():
 
 @frappe.whitelist()
 def sync_woocommerce_resources():
-	woocommerce_settings = frappe.get_doc("woocommerce Settings")
+	woocommerce_settings = frappe.get_doc("WooCommerce Setting")
 
 	make_woocommerce_log(title="Sync Job Queued", status="Queued", method=frappe.local.form_dict.cmd, message="Sync Job Queued")
 	
@@ -44,7 +44,7 @@ def sync_woocommerce_resources():
 			sync_orders()
 			# close_synced_woocommerce_orders() # DO NOT GLOBALLY CLOSE
 			update_item_stock_qty()
-			#frappe.db.set_value("woocommerce Settings", None, "last_sync_datetime", now_time)
+			#frappe.db.set_value("WooCommerce Setting", None, "last_sync_datetime", now_time)
 			
 			make_woocommerce_log(title="Sync Completed", status="Success", method=frappe.local.form_dict.cmd, 
 				message= "Updated {customers} customer(s), {products} item(s), {orders} order(s)".format(**frappe.local.form_dict.count_dict))

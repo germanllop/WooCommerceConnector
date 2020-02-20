@@ -101,7 +101,7 @@ def set_new_attribute_values(item_attr, values):
             })
 
 def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None,variant_of=None, woocommerce_item_list=[]):
-    woocommerce_settings = frappe.get_doc("woocommerce Settings", "woocommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
     valuation_method = woocommerce_settings.get("valuation_method")
     weight_unit =  woocommerce_settings.get("weight_unit")
     
@@ -190,11 +190,11 @@ def get_attribute_value(variant_attr_val, attribute):
 def get_item_group(product_type=None):
     
     #woocommerce supports multiple categories per item, so we just pick a default in ERPNext
-    woocommerce_settings = frappe.get_doc("woocommerce Settings", "woocommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
     return woocommerce_settings.get("default_item_group")
 
 def add_to_price_list(item, name):
-    price_list = frappe.db.get_value("woocommerce Settings", None, "price_list")
+    price_list = frappe.db.get_value("WooCommerce Setting", None, "price_list")
     item_price_name = frappe.db.get_value("Item Price",
         {"item_code": name, "price_list": price_list}, "name")
 
@@ -325,7 +325,7 @@ def sync_erpnext_items(price_list, warehouse, woocommerce_item_list):
 
 def get_erpnext_items(price_list):
     erpnext_items = []
-    woocommerce_settings = frappe.get_doc("woocommerce Settings", "woocommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
 
     last_sync_condition, item_price_condition = "", ""
     if woocommerce_settings.last_sync_datetime:
@@ -398,7 +398,7 @@ def sync_item_with_woocommerce(item, price_list, warehouse):
             
         except requests.exceptions.HTTPError as e:
             if e.args[0] and e.args[0].startswith("404"):
-                if frappe.db.get_value("woocommerce Settings", "woocommerce Settings", "if_not_exists_create_item_to_woocommerce"):
+                if frappe.db.get_value("WooCommerce Setting", "WooCommerce Setting", "if_not_exists_create_item_to_woocommerce"):
                     item_data["id"] = ''
                     create_new_item_to_woocommerce(item, item_data, erp_item, variant_item_name_list)
                 else:
@@ -573,7 +573,7 @@ def get_weight_in_grams(weight, weight_uom):
     return weight * convert_to_gram[weight_uom.lower()]
 
 def get_weight_in_woocommerce_unit(weight, weight_uom):
-    woocommerce_settings = frappe.get_doc("woocommerce Settings", "woocommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
     weight_unit = woocommerce_settings.weight_unit
     convert_to_gram = {
         "kg": 1000,
@@ -619,12 +619,12 @@ def get_weight_in_woocommerce_unit(weight, weight_uom):
 
 def trigger_update_item_stock(doc, method):
     if doc.flags.via_stock_ledger_entry:
-        woocommerce_settings = frappe.get_doc("woocommerce Settings", "woocommerce Settings")
+        woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
         if woocommerce_settings.woocommerce_url and woocommerce_settings.enable_woocommerce:
             update_item_stock(doc.item_code, woocommerce_settings, doc)
 
 def update_item_stock_qty():
-    woocommerce_settings = frappe.get_doc("woocommerce Settings", "woocommerce Settings")
+    woocommerce_settings = frappe.get_doc("WooCommerce Setting", "WooCommerce Setting")
     
     for item in frappe.get_all("Item", fields=["item_code"], filters={"sync_qty_with_woocommerce": '1', "disabled": ("!=", 1)}):
         try:
@@ -659,7 +659,7 @@ def update_item_stock(item_code, woocommerce_settings, bin=None):
             else:
                 item_data, resource = get_product_update_dict_and_resource(item.woocommerce_product_id, item.woocommerce_variant_id, actual_qty=qty)
             try:
-                #make_woocommerce_log(title="Update stock of {0}".format(item.barcode), status="Started", method="update_item_stock", message="Resource: {0}, data: {1}".format(resource, item_data))
+                #make_woocommerce_log(title="Update stock of {0}".format(item.item_code), status="Started", method="update_item_stock", message="Resource: {0}, data: {1}".format(resource, item_data))
                 put_request(resource, item_data)
             except requests.exceptions.HTTPError as e:
                 if e.args[0] and e.args[0].startswith("404"):
@@ -689,20 +689,20 @@ def add_w_id_to_erp():
     frappe.db.sql(purge_ids)
     frappe.db.commit()
 
-    # loop through all items on WooCommerce and get their IDs (matched by barcode)
+    # loop through all items on WooCommerce and get their IDs (matched by item_code)
     woo_items = get_woocommerce_items()
     make_woocommerce_log(title="Syncing IDs", status="Started", method="add_w_id_to_erp", message='Item: {0}'.format(woo_items),
         request_data={}, exception=True)
     for woocommerce_item in woo_items:
         update_item = """UPDATE `tabItem`
             SET `woocommerce_product_id` = '{0}'
-            WHERE `barcode` = '{1}';""".format(woocommerce_item.get("id"), woocommerce_item.get("sku"))
+            WHERE `item_code` = '{1}';""".format(woocommerce_item.get("id"), woocommerce_item.get("sku"))
         frappe.db.sql(update_item)
         frappe.db.commit()
         for woocommerce_variant in get_woocommerce_item_variants(woocommerce_item.get("id")):
             update_variant = """UPDATE `tabItem`
                 SET `woocommerce_variant_id` = '{0}', `woocommerce_product_id` = '{1}'
-                WHERE `barcode` = '{2}';""".format(woocommerce_variant.get("id"), woocommerce_item.get("id"), woocommerce_variant.get("sku"))
+                WHERE `item_code` = '{2}';""".format(woocommerce_variant.get("id"), woocommerce_item.get("id"), woocommerce_variant.get("sku"))
             frappe.db.sql(update_variant)
             frappe.db.commit()
     make_woocommerce_log(title="IDs synced", status="Success", method="add_w_id_to_erp", message={},
