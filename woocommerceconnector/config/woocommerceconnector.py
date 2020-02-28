@@ -11,8 +11,8 @@ def get_data():
 					"type": "doctype",
 					"name": "WooCommerce Setting",
 					"label": _("WooCommerce Setting"),
-					"description": _("Settings"),
-				},
+					"description": _("Settings")
+				}
 			]
 		},
 		{
@@ -23,7 +23,7 @@ def get_data():
 					"type": "doctype",
 					"name": "woocommerce Log",
 					"label": _("Sync Logs"),
-					"description": _("Sync Logs"),
+					"description": _("Sync Logs")
 				}
 			]
 		}
