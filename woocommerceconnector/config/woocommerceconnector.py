@@ -7,24 +7,24 @@ def get_data():
 			"label": _("Settings"),
 			"icon": "fa fa-building",
 			"items": [
-				{
-					"type": "doctype",
-					"name": "WooCommerce Setting",
-					"label": _("WooCommerce Setting"),
-					"description": _("Settings")
-				}
+						{
+							"type": "doctype",
+							"name": "WooCommerce Setting",
+							"label": _("WooCommerce Setting"),
+							"description": _("Settings"),
+						}
 			]
 		},
 		{
 			"label": _("Logs"),
 			"icon": "fa fa-building",
 			"items": [
-				{
-					"type": "doctype",
-					"name": "woocommerce Log",
-					"label": _("Sync Logs"),
-					"description": _("Sync Logs")
-				}
+						{
+							"type": "doctype",
+							"name": "woocommerce Log",
+							"label": _("Sync Logs"),
+							"description": _("Sync Logs"),
+						}
 			]
 		}
 	]
